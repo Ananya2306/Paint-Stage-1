@@ -1,55 +1,39 @@
-var ball;
-
-var database,position;
+var database;
+var drawing = [];
+var currentPath = [];
 
 function setup(){
-    database = firebase.database();
-console.log(database);
-    createCanvas(500,500);
-    ball = createSprite(250,250,10,10);
-    ball.shapeColor = "red";
-    
-    var ballposition = database.ref('ball/position');
-    ballposition.on("value",readposition,showError);
+    var canvas = createCanvas(600,500);
+    canvas.mousePressed(startPath);
+    canvas.mouseReleased(endPath);
 }
-
+function startPath(){
+    currentPath = [];
+    drawing.push(currentPath);
+}function endPath(){
+    
+}
 function draw(){
-    background("white");
-    if(position !== undefined){
-    if(keyDown(LEFT_ARROW)){
-        writePosition(-1,0);
-    }
-    else if(keyDown(RIGHT_ARROW)){
-        writePosition(1,0);
-    }
-    else if(keyDown(UP_ARROW)){
-        writePosition(0,-1);
-    }
-    else if(keyDown(DOWN_ARROW)){
-        writePosition(0,+1);
-    }
+    background("black");
 
-    drawSprites();
-}
-}
-
-function showError(){
-    console.log("error");
+    if(mouseIsPressed) {
+        var point = {
+            x: mouseX,
+            y: mouseY
+        }
+        currentPath.push(point);
+    }
+    noFill("red");
+    stroke("red");
+    strokeWeight(4);
+    
+    for(var i = 0; i< drawing.length; i++){
+        var path = drawing[i];
+        beginShape();
+        for(var p = 0; p< path.length; p++){
+            vertex(path[p].x, path[p].y);
+        }
+        endShape();
+    }
     
 }
-
-function readposition(data){
-    position = data.val();
-    console.log(position.x);
-    ball.x = position.x;
-    ball.y = position.y;
-}
-
-function writePosition(x,y){
-    database.ref('ball/position').set({ 
-        'x' : ball.x + x,
-        'y' : ball.y + y
-    })
-    
-}
-
